@@ -1,9 +1,4 @@
-export const formatDate = (date) => `Due: ${date.toLocaleDateString('en-US')}`;
+export const formatDate = (date) => `Due: ${new Date(date).toLocaleDateString('en-PH')}`;
 
-export const validateTask = ({ title, dueDate } = {}) => {
-    return !!(title && dueDate);
-};
-
-export const mergeTaskUpdate = (original, ...updates) => {
-  return Object.assign({}, original, ...updates);
-};
+export const validateTask = ({ title, dueDate } = {}) => !([title, dueDate].every(Boolean));
+export const mergeTaskUpdate = (original, ...updates) => Object.assign({}, original, ...updates);
