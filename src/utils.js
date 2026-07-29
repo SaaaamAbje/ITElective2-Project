@@ -26,5 +26,5 @@ export function createTask(taskData) {
         id: Date.now(),
         completed: false,
         ...taskData
-    };
+    }; 
 }

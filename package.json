@@ -2,7 +2,7 @@
   "name": "itelect2-project",
   "version": "1.0.0",
   "description": "My IT Elective 2 backend web development project.",
-  "main": "app.js",
+  "main": "src/app.js",
   "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
