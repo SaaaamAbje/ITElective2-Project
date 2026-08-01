@@ -28,3 +28,9 @@ export function createTask(taskData) {
         ...taskData
     }; 
 }
+
+export const initialTasks = [
+  { id: 1, title: 'Learn Express', completed: false, dueDate: '2026-08-01' },
+  { id: 2, title: 'Complete GT5', completed: false, dueDate: '2026-08-05' }
+];
+

@@ -17,5 +17,9 @@
   "bugs": {
     "url": "https://github.com/SaaaamAbje/itelect2-project/issues"
   },
-  "homepage": "https://github.com/SaaaamAbje/itelect2-project#readme"
+  "homepage": "https://github.com/SaaaamAbje/itelect2-project#readme",
+  "dependencies": {
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1"
+  }
 }
