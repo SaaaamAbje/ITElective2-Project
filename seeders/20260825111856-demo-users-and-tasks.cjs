@@ -1,26 +1,31 @@
 'use strict';
+const bcrypt = require('bcryptjs');
 
 module.exports = {
   async up(queryInterface, Sequelize) {
-    // Insert Users and return their generated IDs dynamically
+    const defaultPassword = await bcrypt.hash('Password123!', 10);
+
     const users = await queryInterface.bulkInsert(
       'Users',
       [
         {
-          name: 'Alice Smith',
           email: 'alice@example.com',
+          password: defaultPassword,
+          role: 'member',
           createdAt: new Date(),
           updatedAt: new Date()
         },
         {
-          name: 'Bob Jones',
           email: 'bob@example.com',
+          password: defaultPassword,
+          role: 'member',
           createdAt: new Date(),
           updatedAt: new Date()
         },
         {
-          name: 'Charlie Brown',
           email: 'charlie@example.com',
+          password: defaultPassword,
+          role: 'member',
           createdAt: new Date(),
           updatedAt: new Date()
         }
@@ -28,7 +33,6 @@ module.exports = {
       { returning: ['id'] }
     );
 
-    // Dynamic lookup of user IDs
     const aliceId = users[0].id;
     const bobId = users[1].id;
     const charlieId = users[2].id;
