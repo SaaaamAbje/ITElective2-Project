@@ -1,105 +1,70 @@
 import express from 'express';
-import { createRequire } from 'module';
+import { verifyToken } from '../middleware/verifyToken.js';
+import { requireRole } from '../middleware/requireRole.js';
+import db from '../../models/index.cjs';
 
-const require = createRequire(import.meta.url);
-const db = require('../../models/index.cjs');
-const { Task, User } = db;
-
+const { Task } = db;
 const router = express.Router();
 
-router.get('/users', async (req, res, next) => {
-  try {
-    const users = await User.findAll();
-    res.json(users);
-  } catch (error) {
-    next(error);
-  }
-});
 
 router.get('/tasks', async (req, res, next) => {
   try {
-    const tasks = await Task.findAll({
-      include: User
-    });
+    const tasks = await Task.findAll();
     res.json(tasks);
-  } catch (error) {
-    next(error);
+  } catch (err) {
+    next(err);
   }
 });
 
-router.get('/tasks/:id', async (req, res, next) => {
+
+router.post('/tasks', verifyToken, async (req, res, next) => {
   try {
-    const task = await Task.findByPk(req.params.id, {
-      include: User
-    });
+    const { title, dueDate, completed } = req.body;
 
-    if (!task) {
-      return res.status(404).json({ error: 'Task not found' });
-    }
-
-    res.json(task);
-  } catch (error) {
-    next(error);
-  }
-});
-
-router.post('/tasks', async (req, res, next) => {
-  try {
-    const { title, dueDate, userId } = req.body;
-
-    if (!title || typeof title !== 'string' || title.trim() === '') {
-      return res.status(400).json({ error: 'Invalid task data. Title is required.' });
+    if (!title) {
+      return res.status(400).json({ error: 'Title is required' });
     }
 
     const newTask = await Task.create({
       title,
-      dueDate: dueDate || new Date(),
-      completed: false,
-      userId: userId || null
+      dueDate,
+      completed,
+      userId: req.user.id
     });
 
     res.status(201).json(newTask);
-  } catch (error) {
-    next(error);
+  } catch (err) {
+    next(err);
   }
 });
 
-router.put('/tasks/:id', async (req, res, next) => {
+
+router.put('/tasks/:id', verifyToken, async (req, res, next) => {
   try {
     const task = await Task.findByPk(req.params.id);
-
     if (!task) {
       return res.status(404).json({ error: 'Task not found' });
     }
 
-    const { title, completed, dueDate, userId } = req.body;
-
-    if (title !== undefined) task.title = title;
-    if (completed !== undefined) task.completed = completed;
-    if (dueDate !== undefined) task.dueDate = dueDate;
-    if (userId !== undefined) task.userId = userId;
-
-    await task.save();
-
-    res.status(200).json(task);
-  } catch (error) {
-    next(error);
+    const updatedTask = await task.update(req.body);
+    res.json(updatedTask);
+  } catch (err) {
+    next(err);
   }
 });
 
-router.delete('/tasks/:id', async (req, res, next) => {
+
+router.delete('/tasks/:id', verifyToken, requireRole('admin'), async (req, res, next) => {
   try {
     const task = await Task.findByPk(req.params.id);
-
     if (!task) {
       return res.status(404).json({ error: 'Task not found' });
     }
 
     await task.destroy();
-
-    res.status(200).json({ message: 'Task deleted successfully' });
-  } catch (error) {
-    next(error);
+    res.json({ message: 'Task deleted successfully' });
+  } catch (err) {
+    next(err);
   }
 });
 
