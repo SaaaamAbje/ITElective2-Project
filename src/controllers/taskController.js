@@ -1,4 +1,7 @@
-import db from '../models/index.cjs';
+import { createRequire } from 'module';
+
+const require = createRequire(import.meta.url);
+const db = require('../models/index.cjs');
 
 const { Task } = db;
 
