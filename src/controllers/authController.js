@@ -8,8 +8,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const require = createRequire(import.meta.url);
-const db = require(path.join(__dirname, '../models/index.cjs'));
-
+const db = require(path.join(__dirname, '../../models/index.cjs'));
 const { User } = db;
 
 export const register = async (req, res, next) => {
