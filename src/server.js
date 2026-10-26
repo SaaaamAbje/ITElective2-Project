@@ -3,10 +3,9 @@ import dotenv from 'dotenv';
 import cors from 'cors';
 import morgan from 'morgan';
 import router from './routes/index.js';
-import authRouter from './routes/auth.js'; // 1. IMPORT AUTH ROUTER HERE
+import authRouter from './routes/auth.js';
 
 dotenv.config();
-
 
 if (!process.env.JWT_SECRET) {
   console.error('FATAL ERROR: JWT_SECRET environment variable is not defined.');
@@ -16,12 +15,28 @@ if (!process.env.JWT_SECRET) {
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-app.use(cors());
+// Dynamic CORS configuration as required in Step 1
+const allowedOrigins = [
+  process.env.CORS_ORIGIN,
+  'http://localhost:5173'
+].filter(Boolean);
+
+app.use(cors({
+  origin: function (origin, callback) {
+    // Allow requests with no origin (like mobile apps, Postman, or curl)
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  credentials: true
+}));
+
 app.use(morgan('dev'));
 app.use(express.json());
 
 app.use('/api/auth', authRouter);
-
 app.use('/api', router);
 
 app.use((err, req, res, next) => {
