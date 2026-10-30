@@ -2,9 +2,13 @@ import express from 'express';
 import dotenv from 'dotenv';
 import cors from 'cors';
 import morgan from 'morgan';
+import { createRequire } from 'module';
 import router from './routes/index.js';
 import authRouter from './routes/auth.js';
-import db from './models/index.js'; // Adjust path if models/index.js is located elsewhere
+
+// Setup CommonJS require for loading .cjs model files
+const require = createRequire(import.meta.url);
+const db = require('../models/index.cjs'); 
 
 dotenv.config();
 
@@ -24,7 +28,6 @@ const allowedOrigins = [
 
 app.use(cors({
   origin: function (origin, callback) {
-    // Allow requests with no origin (like mobile apps, Postman, or curl)
     if (!origin || allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {
