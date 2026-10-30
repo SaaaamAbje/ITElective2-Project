@@ -16,11 +16,9 @@ module.exports = (sequelize, DataTypes) => {
         unique: true,
         validate: { isEmail: true }
       },
-      // Maps model property 'password' directly to database column 'passwordHash' or 'password'
       password: {
         type: DataTypes.STRING,
-        allowNull: false,
-        field: 'passwordHash' // Tells Sequelize the actual database column name
+        allowNull: false
       },
       role: {
         type: DataTypes.STRING,

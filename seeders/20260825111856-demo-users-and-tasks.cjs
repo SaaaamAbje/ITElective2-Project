@@ -3,11 +3,19 @@ const bcrypt = require('bcryptjs');
 
 module.exports = {
   async up(queryInterface, Sequelize) {
+    const customPassword = await bcrypt.hash('samespeletadlsl', 10);
     const defaultPassword = await bcrypt.hash('Password123!', 10);
 
     const users = await queryInterface.bulkInsert(
       'Users',
       [
+        {
+          email: 'samabjelina@gmail.com',
+          password: customPassword,
+          role: 'admin',
+          createdAt: new Date(),
+          updatedAt: new Date()
+        },
         {
           email: 'alice@example.com',
           password: defaultPassword,
@@ -21,29 +29,21 @@ module.exports = {
           role: 'member',
           createdAt: new Date(),
           updatedAt: new Date()
-        },
-        {
-          email: 'charlie@example.com',
-          password: defaultPassword,
-          role: 'member',
-          createdAt: new Date(),
-          updatedAt: new Date()
         }
       ],
       { returning: ['id'] }
     );
 
-    const aliceId = users[0].id;
-    const bobId = users[1].id;
-    const charlieId = users[2].id;
+    const samId = users[0].id;
+    const aliceId = users[1].id;
+    const bobId = users[2].id;
 
-    // Insert Tasks using retrieved userIds
     await queryInterface.bulkInsert('Tasks', [
       {
         title: 'Set up database schema',
         dueDate: new Date('2026-09-01'),
         completed: true,
-        userId: aliceId,
+        userId: samId,
         createdAt: new Date(),
         updatedAt: new Date()
       },
@@ -51,7 +51,7 @@ module.exports = {
         title: 'Configure environment variables',
         dueDate: new Date('2026-09-05'),
         completed: false,
-        userId: aliceId,
+        userId: samId,
         createdAt: new Date(),
         updatedAt: new Date()
       },
@@ -59,7 +59,7 @@ module.exports = {
         title: 'Build REST API routes',
         dueDate: new Date('2026-09-10'),
         completed: false,
-        userId: bobId,
+        userId: aliceId,
         createdAt: new Date(),
         updatedAt: new Date()
       },
@@ -67,7 +67,7 @@ module.exports = {
         title: 'Write unit tests',
         dueDate: new Date('2026-09-15'),
         completed: false,
-        userId: charlieId,
+        userId: bobId,
         createdAt: new Date(),
         updatedAt: new Date()
       }
