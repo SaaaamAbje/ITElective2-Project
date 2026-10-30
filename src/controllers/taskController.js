@@ -6,7 +6,8 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const require = createRequire(import.meta.url);
-const db = require(path.join(__dirname, '../models/index.cjs'));
+// Change index.cjs to index.js below
+const db = require(path.join(__dirname, '../../models/index.cjs'));
 
 const { Task } = db;
 
@@ -66,4 +67,4 @@ export const deleteTask = async (req, res, next) => {
   } catch (err) {
     next(err);
   }
-};
+};  
