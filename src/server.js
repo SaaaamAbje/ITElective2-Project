@@ -47,7 +47,6 @@ app.use((err, req, res, next) => {
   res.status(err.status || 500).json({ error: err.message || 'Internal Server Error' });
 });
 
-// Auto-sync database schema and ensure default user exists
 db.sequelize.sync({ alter: true }).then(async () => {
   console.log('Database synced successfully');
 
@@ -61,19 +60,18 @@ db.sequelize.sync({ alter: true }).then(async () => {
         password: hashedPassword,
         role: 'admin'
       });
-      console.log('Admin user samabjelina@gmail.com created successfully.');
+      console.log('Admin user created successfully.');
     } else {
-      // Ensure password hash matches 'samespeletadlsl'
       existingUser.password = hashedPassword;
       await existingUser.save();
-      console.log('Admin user samabjelina@gmail.com updated with fresh password hash.');
+      console.log('Admin user updated with fresh password hash.');
     }
   } catch (seedErr) {
     console.error('Error seeding default user:', seedErr);
   }
 
   app.listen(PORT, () => {
-    console.log(`Server running on http://localhost:${PORT}`);
+    console.log(`Server running on port ${PORT}`);
   });
 }).catch((err) => {
   console.error('Failed to sync database:', err);
