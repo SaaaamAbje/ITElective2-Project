@@ -4,6 +4,7 @@ import cors from 'cors';
 import morgan from 'morgan';
 import router from './routes/index.js';
 import authRouter from './routes/auth.js';
+import db from './models/index.js'; // Adjust path if models/index.js is located elsewhere
 
 dotenv.config();
 
@@ -44,6 +45,12 @@ app.use((err, req, res, next) => {
   res.status(err.status || 500).json({ error: err.message || 'Internal Server Error' });
 });
 
-app.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}`);
+// Auto-sync database schema on startup to ensure 'password' column exists
+db.sequelize.sync({ alter: true }).then(() => {
+  console.log('Database synced successfully');
+  app.listen(PORT, () => {
+    console.log(`Server running on http://localhost:${PORT}`);
+  });
+}).catch((err) => {
+  console.error('Failed to sync database:', err);
 });
