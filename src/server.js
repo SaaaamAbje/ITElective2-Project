@@ -2,11 +2,11 @@ import express from 'express';
 import dotenv from 'dotenv';
 import cors from 'cors';
 import morgan from 'morgan';
+import bcrypt from 'bcryptjs';
 import { createRequire } from 'module';
 import router from './routes/index.js';
 import authRouter from './routes/auth.js';
 
-// Setup CommonJS require for loading .cjs model files
 const require = createRequire(import.meta.url);
 const db = require('../models/index.cjs'); 
 
@@ -20,7 +20,6 @@ if (!process.env.JWT_SECRET) {
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Dynamic CORS configuration as required in Step 1
 const allowedOrigins = [
   process.env.CORS_ORIGIN,
   'http://localhost:5173'
@@ -48,9 +47,31 @@ app.use((err, req, res, next) => {
   res.status(err.status || 500).json({ error: err.message || 'Internal Server Error' });
 });
 
-// Auto-sync database schema on startup to ensure 'password' column exists
-db.sequelize.sync({ alter: true }).then(() => {
+// Auto-sync database schema and ensure default user exists
+db.sequelize.sync({ alter: true }).then(async () => {
   console.log('Database synced successfully');
+
+  try {
+    const existingUser = await db.User.findOne({ where: { email: 'samabjelina@gmail.com' } });
+    const hashedPassword = await bcrypt.hash('samespeletadlsl', 10);
+
+    if (!existingUser) {
+      await db.User.create({
+        email: 'samabjelina@gmail.com',
+        password: hashedPassword,
+        role: 'admin'
+      });
+      console.log('Admin user samabjelina@gmail.com created successfully.');
+    } else {
+      // Ensure password hash matches 'samespeletadlsl'
+      existingUser.password = hashedPassword;
+      await existingUser.save();
+      console.log('Admin user samabjelina@gmail.com updated with fresh password hash.');
+    }
+  } catch (seedErr) {
+    console.error('Error seeding default user:', seedErr);
+  }
+
   app.listen(PORT, () => {
     console.log(`Server running on http://localhost:${PORT}`);
   });
