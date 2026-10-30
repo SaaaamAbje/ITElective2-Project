@@ -4,13 +4,7 @@ const { Model } = require('sequelize');
 module.exports = (sequelize, DataTypes) => {
   class User extends Model {
     static associate(models) {
-      User.hasMany(models.Task, { foreignKey: 'userId' });
-    }
-
-    toJSON() {
-      const values = { ...this.get() };
-      delete values.password;
-      return values;
+      User.hasMany(models.Task, { foreignKey: 'userId', as: 'tasks' });
     }
   }
 
@@ -22,9 +16,11 @@ module.exports = (sequelize, DataTypes) => {
         unique: true,
         validate: { isEmail: true }
       },
+      // Maps model property 'password' directly to database column 'passwordHash' or 'password'
       password: {
         type: DataTypes.STRING,
-        allowNull: false
+        allowNull: false,
+        field: 'passwordHash' // Tells Sequelize the actual database column name
       },
       role: {
         type: DataTypes.STRING,
@@ -33,7 +29,8 @@ module.exports = (sequelize, DataTypes) => {
     },
     {
       sequelize,
-      modelName: 'User'
+      modelName: 'User',
+      tableName: 'Users'
     }
   );
 
